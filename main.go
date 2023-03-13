@@ -1,22 +1,19 @@
 package main
 
 import (
-	"fmt"
-
-	e "github.com/he-man-david/simple-encryption/encryption"
+	"github.com/he-man-david/simple-encryption/encryption"
+	"github.com/he-man-david/simple-encryption/helper"
 )
 
 func main() {
-	var cmd int
+	e := encryption.NewEncryptionSrvc()
 
-	fmt.Println("Welcome to my encryption project.....\n", 
-	"What do you want to do? Enter 1 for encrpt, 2 for decrypt.")
-	fmt.Scanln(&cmd)
+	cmd := helper.StringPrompt("What do you want to do? Enter 'encrypt' or 'decrypt':")
 
 	switch {
-	case cmd == 1:
+	case cmd == "encrypt":
 		e.RunEncryptor()
-	case cmd == 2:
+	case cmd == "decrypt":
 		e.RunDecryptor()
 	default:
 		panic("Invalid entry, please enter 1 or 2 only!")
