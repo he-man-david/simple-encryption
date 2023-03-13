@@ -8,67 +8,58 @@ import (
 	"github.com/he-man-david/simple-encryption/helper"
 )
 type encryptionSrvc struct {
-    iv string
-    secret string
-    message string
+    Message string
 }
 
 func NewEncryptionSrvc() *encryptionSrvc {
     return &encryptionSrvc{
-        iv: "",
-        secret: "",
-        message: "",
-    }
-}
-
-// for testing
-func NewEncryptionSrvcTester() *encryptionSrvc {
-    return &encryptionSrvc{
-        iv: "abdefghijk123456", // must be 16 len IV
-        secret: "12345678901234567890123456789012", // must be 32 len secret
-        message: "",
+        Message: "",
     }
 }
 
 func (e *encryptionSrvc) RunEncryptor() {
+    e.Message = helper.StringPrompt("Please enter message that you want to encrypt -> ")
     for {
-        e.message = helper.StringPrompt("Please enter message that you want to encrypt > ")
-        e.secret  = helper.StringPrompt("Please enter your secret password > ")
+        secret := helper.StringPrompt("Please enter your secret password -> ")
 
-        encryptedMsg, err := e.Encrypt(e.message)
+        encryptedMsg, err := e.Encrypt(e.Message, secret)
         if err != nil {
             panic(err)
         }
-        fmt.Println("Encrypted message > ", encryptedMsg)
+        fmt.Println("Encrypted message -> ", encryptedMsg)
+        e.Message = encryptedMsg
     }
 }
 
 func (e *encryptionSrvc) RunDecryptor() {
+    e.Message = helper.StringPrompt("Please enter message that you want to decrypt -> ")
     for {
-        e.message = helper.StringPrompt("Please enter message that you want to decrypt > ")
-        e.secret  = helper.StringPrompt("Please enter your secret password > ")
+        secret := helper.StringPrompt("Please enter your secret password -> ")
 
-        decryptedMsg, err := e.Decrypt(e.message)
+        decryptedMsg, err := e.Decrypt(e.Message, secret)
         if err != nil {
             panic(err)
         }
-        fmt.Println("Decrypted message > ", decryptedMsg)
+        fmt.Println("Decrypted message -> ", decryptedMsg)
+        e.Message = decryptedMsg
     }
 }
 
 // Encrypt method is to encrypt or hide any classified text
-func (e *encryptionSrvc) Encrypt(text string) (string, error) {
-    e.iv = helper.FillPadding(e.iv, 16)
-    e.secret = helper.FillPadding(e.secret, 32)
-	// create new AES cipher block, with our e.secret
-	block, err := aes.NewCipher([]byte(e.secret))
+func (e *encryptionSrvc) Encrypt(text, secret string) (string, error) {
+    // IV is like a nonce, ideally should store securely along with 
+    // the secret, but for experimenting we just calc on the fly
+    iv := helper.FillPadding(secret, 16)   
+    secret = helper.FillPadding(secret, 32)
+	// create new AES cipher block, with our secret
+	block, err := aes.NewCipher([]byte(secret))
 	if err != nil {
 		return "", err
 	}
 	// create byte array format of string text
 	plainText := []byte(text)
 	// create encrypter interface using block, and e.iv
-	cfb := cipher.NewCFBEncrypter(block, []byte(e.iv))
+	cfb := cipher.NewCFBEncrypter(block, []byte(iv))
 	cipherText := make([]byte, len(plainText))
 	cfb.XORKeyStream(cipherText, plainText)
 	// encode to string from byte array
@@ -76,18 +67,20 @@ func (e *encryptionSrvc) Encrypt(text string) (string, error) {
 }
 
 // Decrypt method is to extract back the encrypted text
-func (e *encryptionSrvc) Decrypt(text string) (string, error) {
-    e.iv = helper.FillPadding(e.iv, 16)
-    e.secret = helper.FillPadding(e.secret, 32)
-	// create new AES cipher block, with our e.secret
-	block, err := aes.NewCipher([]byte(e.secret))
+func (e *encryptionSrvc) Decrypt(text, secret string) (string, error) {
+    // IV is like a nonce, ideally should store securely along with 
+    // the secret, but for experimenting we just calc on the fly
+    iv := helper.FillPadding(secret, 16)
+    secret = helper.FillPadding(secret, 32)
+	// create new AES cipher block, with our secret
+	block, err := aes.NewCipher([]byte(secret))
 	if err != nil {
 		return "", err
 	}
 	// convert string to byte []
 	cipherText := helper.Decode(text)
 	// create decrypter interface from block and e.iv
-	cfb := cipher.NewCFBDecrypter(block, []byte(e.iv))
+	cfb := cipher.NewCFBDecrypter(block, []byte(iv))
 	plainText := make([]byte, len(cipherText))
 	cfb.XORKeyStream(plainText, cipherText)
 	// return decrypted message as string

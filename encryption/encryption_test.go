@@ -1,22 +1,26 @@
 package encryption
 
 import (
+	"fmt"
 	"testing"
 )
 
 var (
-	messageA = "h0iuI+XUnhil1CKdzX0nR8KdP+3cVzD7P4N7wR7wbgLBH/aUNcT0cHGZO+ULj4ZDHmCNFg8I9URdy/Y0qHN7KhxBclk4XB94FekqzD9PN9289DfwoZEvhh1Y04xny8QZRJIX+2S1w17VV1UMWC1LWBMHD3fpBNN83j7tWI3KtOJw9v0EofyKv8uBTUQvtuGgogr3Y/VL+R0F1xXFg5f2tj9mo4TlEOHsiOZu786177emCuRX77qkt8YoKgR9lCB1AD7//dw6Jpj/CYf/fG9g51EZ2ytFDu9RZoWzMireOKcGbUWXnH3f/Hj9UbcT+5baJX6/KtO330fDSlFcBT4tz3twr79p0PbOi1I6DxkG5YHhcWzaEiBlBP9gAucmMdfUOTLIPundNiYiMrWLwSPK9iqbRHQeiHooO9A94vQ5CmhrKsItGOb0XlsCiF1UdOXsJiY7f39ZakOxjuMtHQLpPBiDt4ljPwSH4Twwb+eICQQZ2KL0SY97ffYhLCOeIGk1r4sYrRXm0x8Mvw5VOor4560+zuszlYFp1zv1Vf1NlKASVdQgHv11Hmk373toi3TlLznBHp2S34hgs6CPJH4+FlOL2lo3x0OmqFO888TokyCybPo8tknnBYSBvbIXNferOhkaV6njPan+zKl8L2ipHt8SLHfpnEGCWZYUaJMwaRgfRLK6dZs/eiNmtO5BUxyMQq1/+9BW6ZFMS4JAyYp+qlHfp6UXRqop6xyCz65v21qT6dSiKXAnL6e5ubZh+oebFLbiH+TjcYRqAGN4LZ3R+R5tLUFaR8ygT3NAnR308vQmtKLl7xok5g=="
+	secret = "abc123"
+	messageA = "ETRv2CFwJZV3yIy5bS4nAaaca5+56kekbdEJWI1JJ4jaOPw/pkGQD4Ih8JyhExopyOPdq+J4OhunezhjhJRSDiciQOUoJw1/XQBIqpMkE3Fw7FxGgy2vSnIv5lC0G3cEyVy/yrkgQQMW81OkMsCqXkvu6fJlIhibb0AZggNsWrcIQVwPjp5QypTx1AHHer/6qpHdWbUDTCNWii0xS9Whf2CkY5kh0PAhf9cN7Hq8BZeve5BxEtB5D+WJQn2g+qH1coen3Qs8dYM+9OCplqnI+ZyGofGBMbn8BNk5IIZqYTJf0LenS47UURsz+K2SdYQ3MlhlwJo3h3ZBhAX8ZR6fHOXSAeJ1jHB4CGEbnmH+UM4mJ5EWNNHMArwfTvR1BSO83A5Y+lu6w25ZvdVSpBmeex/S7cPM5xuQ/IAFaSv9Pvz/0w5TzXxHDa/L7lp0nCo/DOkfskZ2mniotXqS2c8a8MCXPkPd+EzSG0JEL+9tL51N7j2PySvwHLvG2I1UzvzZwKSf0VbYWLj11QsOn2Q//1j922ES1rRQXbgcdQq4n8DWCfJyGlxCAoX1NUXWOs23qQsI5lUCub99D4/wncmkjs/aNw8jix8sU7SY6lcTw0Hr7yoF9E3iA7AHOdqdvf6tdOtC+UglKn9Ak0cX8ijVOgEDmterNP6/p946I+6y2xWrGOY2c/4Dn5xsifyghNmvERaLpZWgBcREBb2TG96+rwquvbR3VbdFoBKJZAZyayKWMrGOt8NhVjjt4ojAXj++QP5Tb4ZnY19O+CLMB+6Nj4qV3SppCUPTsIo+3bjRTXAKHM6SLyJ5Ag=="
+	messageB = "JkLQ/6Jn/qKIT5RW9KD7uXxb0OYogFqwZb6QWHGMceb2im2iVJMpy20F77kY3Dsu5oPZjmAXhEls7RLMxP/JCB6LmbyhVQ413IEA+YvPArcCURGVOosJr6bCNQ6TzaX9hsbBtSPFBiOB+bDhGbM14AJuWabE3rXgc7KpMKXVrkv+lpNavFrC/GuczjOrkjGzupgd2PeEXQcsqmBz5wreKCRfYofuWYbJUj6JxJ3CHXpa2SaAL9EKD0vkUQj++yxYPoDykBxAYVvMFYfWLf1y8kX+zFtOMpCTHvg5PUT1rnk/2AVS5afzVQvBo5qxf+2SCjZ97lyQwjOOqzyNx5WxeHqPsSHS0uDLh/cP4Hq0Eg69GZr/MsEML4mTsogAqHEHwIuFHKnqcFjKqgR+pDNFvyQgTMu/1dzYmrKx9gZRjxax/Jz3U1FoQqyNFqVYzJNTO6Qo4tDUvGYsZer5uvdPPAEAvtQGjh/PXF4CQimCJSjrXWhmYhOWgwB4BRJIETArul8qkHdhIOtTaIlaxDaEuboZmV61tUItFBRI/6nhjpsOm8uWE26foeUetNs+HzMoI9V9B+wwFlE/2SRAzrqSPFFXVtEoU49Jsm/MhLGIWCkm60FJM7iFKiznewuxSOEA0ctwfzySUruEk5+2scYIpmZAGIHDp2/JQUwk5YbQk8Vy+Oi5B5nYIGlzQNzV8j1vM5yKL3v80OMqMSJK23c1EwZ/OpYGSgX9Wd/VsyZ/Eqv/fc4BobqnqXS7joONwd1P1jZJ5i+Wvv8NuBM9vfi4zg=="
+	messageE = "jP2dZkVzK/lC6uEgvcib5X1Qy9CaRVhL5wSJMhmwc/8iOnVJqbhIi66+nKKc/sTptiCMutbaI3TKfgnbRMzVn+eZPKPku14zhMiizUKDkq1JSL13fxjyvrS21sg3U53HGuLE5GWhvKxZiQMWsdlECatAQGobgq9K7jLxtgcpwLw9CtNxTW/HO/tWi+vbLyZ0QAiSqHw2lMOADyx/ywMLX150q7n4UsP1ikNCx4uVfs0+woN40Htz1tmYRTymBoLMm0F5g9cc/oY0WIVX+SDDuu6g8ffx06qQ8isGOZ8MLTJH5syzyJQpSrVEcGNaU9/NttqNTMu6sQvhWh4IrgOrqvTxqZRt2VSZ2J4XgFhUb6VtOD2fb7pXjRqMTGK3/Ockgywe5TMQIEvDh0Wry+ugnnm2nC3mGrsDF8AwaWH9BLeX/sD9GZfy9SVSPBkIu+eM1DJ3yE3u1UpLvy8AFSx024b0dJ5m4bGFZGv2wYt9XXEJIBrzFAqbbRPAlaf79CCfqqVzOizQbpF+I6/nY39A3s4oFmRgHBTzTTsG56jAqL1D9r+O/Gg3L0853VWRO5qZUklUut3iyzkOEaQ5+5Uo1BNkxTNK3q42Q8OUDOYK4eN9UeugLxJTSimJMXzx5DjqUGF7CslW+f2yzXa5SnAb8onTtrzwkoAZlloeQ5voPXBwXhReC1MAcdhE1VkCgfIKM9aY4nU1ac9oOvGjFg2COT5saNkJpZtlbrbI0l21jpwFgzN5gb/0szN6DYGUrB+1AiUWdGBQCIX1S3KGcCvK7+ihwUCfWoek"
 )
 
 func TestEncryption(t *testing.T) {
-	e := NewEncryptionSrvcTester()
+	e := NewEncryptionSrvc()
 
-	encryptedMsg, err := e.Encrypt(messageA)
+	encryptedMsg, err := e.Encrypt(messageA, secret)
 	if err != nil {
 		t.Errorf("Failed to encrypt message! %s", messageA)
 	}
 
-	decryptedMsg, err := e.Decrypt(encryptedMsg)
+	decryptedMsg, err := e.Decrypt(encryptedMsg, secret)
 	if err != nil {
 		t.Errorf("Failed to decrypt message! %s", encryptedMsg)
 	}
@@ -24,4 +28,5 @@ func TestEncryption(t *testing.T) {
 	if decryptedMsg != messageA {
 		t.Errorf("Decrypted msg not the same as original msg. \n Decrypted: %s \n Original: %s", decryptedMsg, messageA)
 	}
+	fmt.Println("Encryption Test passed...")
 }

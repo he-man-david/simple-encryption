@@ -23,7 +23,7 @@ func Decode(s string) []byte {
 func FillPadding(text string, size int) string {
     pad := size - len(text)
     for i := 0; i < pad; i++ {
-        text += "_"
+        text += "0"
     }
     return text
 } 
