@@ -7,26 +7,35 @@ import (
 
 	"github.com/he-man-david/simple-encryption/helper"
 )
-type EncryptionSrvc struct {
+type encryptionSrvc struct {
     iv string
     secret string
     message string
 }
 
-func NewEncryptionSrvc() *EncryptionSrvc {
-    return &EncryptionSrvc{
+func NewEncryptionSrvc() *encryptionSrvc {
+    return &encryptionSrvc{
         iv: "",
         secret: "",
         message: "",
     }
 }
 
-func (e *EncryptionSrvc) RunEncryptor() {
+// for testing
+func NewEncryptionSrvcTester() *encryptionSrvc {
+    return &encryptionSrvc{
+        iv: "abdefghijk123456", // must be 16 len IV
+        secret: "12345678901234567890123456789012", // must be 32 len secret
+        message: "",
+    }
+}
+
+func (e *encryptionSrvc) RunEncryptor() {
     for {
         e.message = helper.StringPrompt("Please enter message that you want to encrypt > ")
         e.secret  = helper.StringPrompt("Please enter your secret password > ")
 
-        encryptedMsg, err := e.encrypt(e.message)
+        encryptedMsg, err := e.Encrypt(e.message)
         if err != nil {
             panic(err)
         }
@@ -34,12 +43,12 @@ func (e *EncryptionSrvc) RunEncryptor() {
     }
 }
 
-func (e *EncryptionSrvc) RunDecryptor() {
+func (e *encryptionSrvc) RunDecryptor() {
     for {
         e.message = helper.StringPrompt("Please enter message that you want to decrypt > ")
         e.secret  = helper.StringPrompt("Please enter your secret password > ")
 
-        decryptedMsg, err := e.decrypt(e.message)
+        decryptedMsg, err := e.Decrypt(e.message)
         if err != nil {
             panic(err)
         }
@@ -48,8 +57,8 @@ func (e *EncryptionSrvc) RunDecryptor() {
 }
 
 // Encrypt method is to encrypt or hide any classified text
-func (e *EncryptionSrvc) encrypt(text string) (string, error) {
-    e.iv = helper.FillPadding(e.secret, 16)
+func (e *encryptionSrvc) Encrypt(text string) (string, error) {
+    e.iv = helper.FillPadding(e.iv, 16)
     e.secret = helper.FillPadding(e.secret, 32)
 	// create new AES cipher block, with our e.secret
 	block, err := aes.NewCipher([]byte(e.secret))
@@ -67,8 +76,8 @@ func (e *EncryptionSrvc) encrypt(text string) (string, error) {
 }
 
 // Decrypt method is to extract back the encrypted text
-func (e *EncryptionSrvc) decrypt(text string) (string, error) {
-    e.iv = helper.FillPadding(e.secret, 16)
+func (e *encryptionSrvc) Decrypt(text string) (string, error) {
+    e.iv = helper.FillPadding(e.iv, 16)
     e.secret = helper.FillPadding(e.secret, 32)
 	// create new AES cipher block, with our e.secret
 	block, err := aes.NewCipher([]byte(e.secret))

@@ -1,2 +1,3 @@
 # simple-encryption
-Playing with AES Ciphers
+
+A repo for experimenting and playing with AES Ciphers encryptions
