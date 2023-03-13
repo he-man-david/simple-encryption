@@ -23,27 +23,27 @@ func NewEncryptionSrvc() *EncryptionSrvc {
 
 func (e *EncryptionSrvc) RunEncryptor() {
     for {
-        e.message = helper.StringPrompt("Please enter message that you want to encrypt:")
-        e.secret  = helper.StringPrompt("Please enter your secret password:")
+        e.message = helper.StringPrompt("Please enter message that you want to encrypt > ")
+        e.secret  = helper.StringPrompt("Please enter your secret password > ")
 
         encryptedMsg, err := e.encrypt(e.message)
         if err != nil {
             panic(err)
         }
-        fmt.Println("Encrypted message:", encryptedMsg)
+        fmt.Println("Encrypted message > ", encryptedMsg)
     }
 }
 
 func (e *EncryptionSrvc) RunDecryptor() {
     for {
-        e.message = helper.StringPrompt("Please enter message that you want to decrypt:")
-        e.secret  = helper.StringPrompt("Please enter your secret password:")
+        e.message = helper.StringPrompt("Please enter message that you want to decrypt > ")
+        e.secret  = helper.StringPrompt("Please enter your secret password > ")
 
         decryptedMsg, err := e.decrypt(e.message)
         if err != nil {
             panic(err)
         }
-        fmt.Println("Decrypted message:", decryptedMsg)
+        fmt.Println("Decrypted message > ", decryptedMsg)
     }
 }
 
